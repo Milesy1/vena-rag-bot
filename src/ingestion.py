@@ -63,13 +63,10 @@ def chunk_documents(documents: List) -> List:
     return chunks
 
 
-def create_vector_store(chunks: List) -> Chroma:
+def create_vector_store(chunks: List, in_memory: bool = False) -> Chroma:
     """Create ChromaDB vector store from document chunks."""
     
     print(f"[+] Generating embeddings and storing in ChromaDB...")
-    
-    # Ensure directory exists
-    settings.chroma_persist_dir.mkdir(parents=True, exist_ok=True)
     
     # Initialize embeddings
     embeddings = OpenAIEmbeddings(
@@ -77,18 +74,29 @@ def create_vector_store(chunks: List) -> Chroma:
         openai_api_key=settings.openai_api_key
     )
     
-    # Create vector store
-    vector_store = Chroma.from_documents(
-        documents=chunks,
-        embedding=embeddings,
-        persist_directory=str(settings.chroma_persist_dir)
-    )
+    if in_memory:
+        # Use in-memory storage (for Streamlit Cloud)
+        vector_store = Chroma.from_documents(
+            documents=chunks,
+            embedding=embeddings
+        )
+        print(f"   [OK] Vector store created in memory")
+    else:
+        # Ensure directory exists
+        settings.chroma_persist_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create vector store with persistence
+        vector_store = Chroma.from_documents(
+            documents=chunks,
+            embedding=embeddings,
+            persist_directory=str(settings.chroma_persist_dir)
+        )
+        print(f"   [OK] Vector store created at: {settings.chroma_persist_dir}")
     
-    print(f"   [OK] Vector store created at: {settings.chroma_persist_dir}")
     return vector_store
 
 
-def ingest_knowledge_base() -> Chroma:
+def ingest_knowledge_base(in_memory: bool = False) -> Chroma:
     """Main ingestion pipeline: Load → Chunk → Embed → Store."""
     
     print("\n" + "="*50)
@@ -118,7 +126,7 @@ def ingest_knowledge_base() -> Chroma:
     chunks = chunk_documents(documents)
     
     # Create vector store
-    vector_store = create_vector_store(chunks)
+    vector_store = create_vector_store(chunks, in_memory=in_memory)
     
     print("\n" + "="*50)
     print("[OK] Ingestion complete!")
