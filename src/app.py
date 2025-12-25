@@ -79,12 +79,20 @@ def main():
             st.info("Copy env.example to .env and add your OpenAI API key")
             return
         
-        # Vector store status
+        # Vector store status - auto-ingest if needed
         if settings.chroma_persist_dir.exists():
             st.success("✅ Knowledge base loaded")
         else:
             st.warning("⚠️ Knowledge base not found")
-            st.info("Run: python -m src.ingestion")
+            if st.button("📥 Build Knowledge Base"):
+                with st.spinner("Ingesting documents..."):
+                    try:
+                        from src.ingestion import ingest_knowledge_base
+                        ingest_knowledge_base()
+                        st.success("✅ Knowledge base built!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Ingestion failed: {e}")
         
         st.divider()
         

@@ -7,6 +7,24 @@ from pathlib import Path
 from pydantic_settings import BaseSettings
 
 
+def get_openai_key() -> str:
+    """Get OpenAI API key from environment, .env, or Streamlit secrets."""
+    # Try environment variable first
+    key = os.getenv("OPENAI_API_KEY", "")
+    if key and key != "sk-your-api-key-here":
+        return key
+    
+    # Try Streamlit secrets (for Streamlit Cloud)
+    try:
+        import streamlit as st
+        if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
+            return st.secrets['OPENAI_API_KEY']
+    except:
+        pass
+    
+    return ""
+
+
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
@@ -33,6 +51,12 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         extra = "ignore"
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Override with Streamlit secrets if available
+        if not self.openai_api_key or self.openai_api_key == "sk-your-api-key-here":
+            self.openai_api_key = get_openai_key()
 
 
 # Global settings instance
