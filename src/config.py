@@ -42,12 +42,12 @@ settings = Settings()
 def validate_settings() -> bool:
     """Validate that required settings are configured."""
     if not settings.openai_api_key or settings.openai_api_key == "sk-your-api-key-here":
-        print("❌ Error: OPENAI_API_KEY not configured!")
+        print("[ERROR] OPENAI_API_KEY not configured!")
         print("   1. Copy env.example to .env")
         print("   2. Add your OpenAI API key")
         return False
     
-    print("✅ Configuration validated successfully!")
+    print("[OK] Configuration validated successfully!")
     print(f"   Model: {settings.openai_model}")
     print(f"   Embeddings: {settings.embedding_model}")
     print(f"   Knowledge Base: {settings.knowledge_base_dir}")

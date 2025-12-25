@@ -9,8 +9,8 @@ from pathlib import Path
 
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema import Document
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.documents import Document
 
 from src.config import settings
 
@@ -70,9 +70,9 @@ class RAGPipeline:
                 persist_directory=str(settings.chroma_persist_dir),
                 embedding_function=self.embeddings
             )
-            print(f"✅ Loaded vector store from: {settings.chroma_persist_dir}")
+            print(f"[OK] Loaded vector store from: {settings.chroma_persist_dir}")
         else:
-            print("⚠️  No vector store found. Run ingestion first!")
+            print("[WARNING] No vector store found. Run ingestion first!")
             self.vector_store = None
     
     def retrieve(self, query: str, top_k: int = None) -> List[Document]:
@@ -116,7 +116,7 @@ class RAGPipeline:
         Returns:
             Tuple of (response_text, source_documents)
         """
-        print(f"\n🔍 Query: {question}")
+        print(f"\n[QUERY] {question}")
         
         # Retrieve relevant documents
         documents = self.retrieve(question)
