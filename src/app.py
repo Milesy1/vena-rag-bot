@@ -95,13 +95,14 @@ def main():
             st.info("Add OPENAI_API_KEY to Streamlit secrets or .env file")
             return
         
-        # Vector store status - auto-ingest if needed
-        if settings.chroma_persist_dir.exists():
+        # Vector store status - check if actually has data
+        chroma_db_file = settings.chroma_persist_dir / "chroma.sqlite3"
+        if chroma_db_file.exists():
             st.success("✅ Knowledge base loaded")
         else:
-            st.warning("⚠️ Knowledge base not found")
+            st.warning("⚠️ Knowledge base not built yet")
             if st.button("📥 Build Knowledge Base"):
-                with st.spinner("Ingesting documents..."):
+                with st.spinner("Ingesting documents... (this may take a minute)"):
                     try:
                         from src.ingestion import ingest_knowledge_base
                         ingest_knowledge_base()
