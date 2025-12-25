@@ -65,7 +65,8 @@ class RAGPipeline:
     
     def _load_vector_store(self):
         """Load existing ChromaDB vector store."""
-        if settings.chroma_persist_dir.exists():
+        chroma_db_file = settings.chroma_persist_dir / "chroma.sqlite3"
+        if chroma_db_file.exists():
             self.vector_store = Chroma(
                 persist_directory=str(settings.chroma_persist_dir),
                 embedding_function=self.embeddings
@@ -146,6 +147,11 @@ def get_rag_pipeline() -> RAGPipeline:
     if _rag_pipeline is None:
         _rag_pipeline = RAGPipeline()
     return _rag_pipeline
+
+def reset_rag_pipeline():
+    """Reset the RAG pipeline singleton (call after rebuilding knowledge base)."""
+    global _rag_pipeline
+    _rag_pipeline = None
 
 
 if __name__ == "__main__":
