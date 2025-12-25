@@ -57,11 +57,27 @@ def display_chat_history():
                         st.write(f"• {source}")
 
 
+def get_api_key():
+    """Get API key from settings or Streamlit secrets."""
+    # Check Streamlit secrets first (for Cloud deployment)
+    if 'OPENAI_API_KEY' in st.secrets:
+        return st.secrets['OPENAI_API_KEY']
+    # Fall back to settings (local .env)
+    if settings.openai_api_key and settings.openai_api_key != "sk-your-api-key-here":
+        return settings.openai_api_key
+    return None
+
+
 def main():
     """Main Streamlit application."""
     
     # Initialize
     initialize_session_state()
+    
+    # Get API key (check secrets first for Cloud deployment)
+    api_key = get_api_key()
+    if api_key:
+        settings.openai_api_key = api_key
     
     # Header
     st.title("🤖 Vena RAG Bot")
@@ -72,11 +88,11 @@ def main():
         st.header("⚙️ Settings")
         
         # Configuration status
-        if settings.openai_api_key and settings.openai_api_key != "sk-your-api-key-here":
+        if api_key:
             st.success("✅ API Key configured")
         else:
             st.error("❌ API Key not configured")
-            st.info("Copy env.example to .env and add your OpenAI API key")
+            st.info("Add OPENAI_API_KEY to Streamlit secrets or .env file")
             return
         
         # Vector store status - auto-ingest if needed
