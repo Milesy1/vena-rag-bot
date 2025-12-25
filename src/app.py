@@ -32,10 +32,17 @@ def initialize_session_state():
         st.session_state.rag_pipeline = None
 
 
-def load_rag_pipeline():
+def load_rag_pipeline(force_reload=False):
     """Load the RAG pipeline."""
+    if force_reload:
+        st.session_state.rag_pipeline = None
+    
     if st.session_state.rag_pipeline is None:
         try:
+            # Check if vector store exists first
+            chroma_db_file = settings.chroma_persist_dir / "chroma.sqlite3"
+            if not chroma_db_file.exists():
+                return False
             st.session_state.rag_pipeline = get_rag_pipeline()
             return True
         except Exception as e:
@@ -99,6 +106,20 @@ def main():
         chroma_db_file = settings.chroma_persist_dir / "chroma.sqlite3"
         if chroma_db_file.exists():
             st.success("✅ Knowledge base loaded")
+            # Add rebuild option
+            if st.button("🔄 Rebuild Knowledge Base"):
+                with st.spinner("Rebuilding... (this may take a minute)"):
+                    try:
+                        import shutil
+                        if settings.chroma_persist_dir.exists():
+                            shutil.rmtree(settings.chroma_persist_dir)
+                        from src.ingestion import ingest_knowledge_base
+                        ingest_knowledge_base()
+                        st.session_state.rag_pipeline = None  # Force reload
+                        st.success("✅ Knowledge base rebuilt!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Rebuild failed: {e}")
         else:
             st.warning("⚠️ Knowledge base not built yet")
             if st.button("📥 Build Knowledge Base"):
@@ -106,6 +127,7 @@ def main():
                     try:
                         from src.ingestion import ingest_knowledge_base
                         ingest_knowledge_base()
+                        st.session_state.rag_pipeline = None  # Force reload
                         st.success("✅ Knowledge base built!")
                         st.rerun()
                     except Exception as e:
@@ -127,7 +149,7 @@ def main():
     
     # Load RAG pipeline
     if not load_rag_pipeline():
-        st.warning("Please configure the system and ingest documents first.")
+        st.info("👆 Click **'Build Knowledge Base'** in the sidebar to get started!")
         return
     
     # Display chat history
