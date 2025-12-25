@@ -92,8 +92,17 @@ Remember: Only use information from the context above. Cite your sources."""
     messages = prompt.format_messages(context=context, question=question)
     response = llm.invoke(messages)
     
-    # Extract sources
-    sources = list(set([Path(doc.metadata.get("source", "unknown")).stem for doc in docs]))
+    # Extract sources with content
+    sources = []
+    seen = set()
+    for doc in docs:
+        source_name = Path(doc.metadata.get("source", "unknown")).stem
+        if source_name not in seen:
+            seen.add(source_name)
+            sources.append({
+                "name": source_name,
+                "content": doc.page_content[:500] + "..." if len(doc.page_content) > 500 else doc.page_content
+            })
     
     return response.content, sources
 
@@ -106,9 +115,14 @@ def display_chat_history():
             
             # Show sources for assistant messages
             if message["role"] == "assistant" and "sources" in message:
-                with st.expander("📚 Sources"):
+                with st.expander("📚 View Sources"):
                     for source in message["sources"]:
-                        st.write(f"• {source}")
+                        if isinstance(source, dict):
+                            st.markdown(f"**{source['name']}**")
+                            st.markdown(f"```\n{source['content']}\n```")
+                            st.divider()
+                        else:
+                            st.write(f"• {source}")
 
 
 def get_api_key():
@@ -215,10 +229,12 @@ def main():
                     # Display response
                     st.markdown(response)
                     
-                    # Show sources
-                    with st.expander("📚 Sources"):
+                    # Show sources with content
+                    with st.expander("📚 View Sources"):
                         for source in sources:
-                            st.write(f"• {source}")
+                            st.markdown(f"**{source['name']}**")
+                            st.markdown(f"```\n{source['content']}\n```")
+                            st.divider()
                     
                     # Save to history
                     st.session_state.messages.append({
