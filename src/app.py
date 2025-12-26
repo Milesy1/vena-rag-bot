@@ -36,7 +36,13 @@ def initialize_session_state():
 
 def build_knowledge_base():
     """Build the knowledge base in memory."""
-    from src.ingestion import ingest_knowledge_base
+    from src.ingestion import ingest_knowledge_base, load_documents
+    from src.config import settings
+    
+    # First show what documents we find
+    docs = load_documents(settings.knowledge_base_dir)
+    st.session_state.doc_count = len(docs)
+    
     vector_store = ingest_knowledge_base(in_memory=True)
     st.session_state.vector_store = vector_store
     st.session_state.kb_loaded = True
@@ -165,13 +171,14 @@ def main():
         
         # Knowledge base status
         if st.session_state.kb_loaded:
-            st.success("✅ Knowledge base loaded")
+            doc_count = st.session_state.get('doc_count', '?')
+            st.success(f"✅ Knowledge base loaded ({doc_count} docs)")
             # Add rebuild option
             if st.button("🔄 Rebuild Knowledge Base"):
                 with st.spinner("Rebuilding... (this may take a minute)"):
                     try:
                         build_knowledge_base()
-                        st.success("✅ Knowledge base rebuilt!")
+                        st.success(f"✅ Rebuilt with {st.session_state.get('doc_count', '?')} docs!")
                         st.rerun()
                     except Exception as e:
                         st.error(f"Rebuild failed: {e}")
