@@ -38,10 +38,15 @@ def build_knowledge_base():
     """Build the knowledge base in memory."""
     from src.ingestion import ingest_knowledge_base, load_documents
     from src.config import settings
+    from pathlib import Path
     
     # First show what documents we find
     docs = load_documents(settings.knowledge_base_dir)
     st.session_state.doc_count = len(docs)
+    
+    # Debug: Count by folder
+    comparisons = [d for d in docs if 'Comparisons' in str(d.metadata.get('source', ''))]
+    st.session_state.comparison_count = len(comparisons)
     
     vector_store = ingest_knowledge_base(in_memory=True)
     st.session_state.vector_store = vector_store
@@ -172,7 +177,10 @@ def main():
         # Knowledge base status
         if st.session_state.kb_loaded:
             doc_count = st.session_state.get('doc_count', '?')
+            comparison_count = st.session_state.get('comparison_count', 0)
             st.success(f"✅ Knowledge base loaded ({doc_count} docs)")
+            if comparison_count > 0:
+                st.info(f"📊 Including {comparison_count} comparison documents")
             # Add rebuild option
             if st.button("🔄 Rebuild Knowledge Base"):
                 with st.spinner("Rebuilding... (this may take a minute)"):
