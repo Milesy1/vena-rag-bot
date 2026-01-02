@@ -46,3 +46,9 @@ If automated ETL cannot be fixed immediately:
 - Maintain source system connectivity checks
 - Document ETL dependencies and contacts
 
+
+
+
+
+
+

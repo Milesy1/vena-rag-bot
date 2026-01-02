@@ -52,3 +52,9 @@ Set up validation rules in Vena to:
 - Send alerts for out-of-balance conditions
 - Log validation results for audit trail
 
+
+
+
+
+
+
