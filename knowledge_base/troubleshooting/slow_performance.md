@@ -54,3 +54,9 @@ Templates, reports, or queries are taking a long time to load or execute.
 - Reduce the date range
 - Export data and work offline for analysis
 
+
+
+
+
+
+
