@@ -1,4 +1,4 @@
-# Vena RAG Bot - Proof of Concept Proposal
+# FCS RAG Bot - Proof of Concept Proposal
 
 **Document Version:** 1.0  
 **Date:** December 24, 2024  

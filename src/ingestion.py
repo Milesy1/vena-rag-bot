@@ -1,5 +1,5 @@
 """
-Document ingestion pipeline for the Vena RAG Bot.
+Document ingestion pipeline for the FCS RAG Bot.
 
 Loads documents from knowledge_base/, chunks them, generates embeddings,
 and stores them in ChromaDB for semantic search.
@@ -100,7 +100,7 @@ def ingest_knowledge_base(in_memory: bool = False) -> Chroma:
     """Main ingestion pipeline: Load → Chunk → Embed → Store."""
     
     print("\n" + "="*50)
-    print("[*] Vena RAG Bot - Knowledge Base Ingestion")
+    print("[*] FCS RAG Bot - Knowledge Base Ingestion")
     print("="*50 + "\n")
     
     # Validate configuration

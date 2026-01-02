@@ -1,4 +1,4 @@
-# Vena RAG Bot POC - Dependencies
+# FCS RAG Bot POC - Dependencies
 # Python 3.11+ required
 
 # Core RAG Framework

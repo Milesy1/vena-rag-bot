@@ -1,5 +1,5 @@
 """
-Configuration settings for the Vena RAG Bot POC.
+Configuration settings for the FCS RAG Bot POC.
 """
 
 import os
@@ -35,7 +35,8 @@ class Settings(BaseSettings):
     
     # Paths
     project_root: Path = Path(__file__).parent.parent
-    knowledge_base_dir: Path = project_root / "knowledge_base"
+    # Allow knowledge base path to be set via environment variable (e.g., for Dropbox)
+    knowledge_base_dir: Path = Path(os.getenv("KNOWLEDGE_BASE_DIR", str(project_root / "knowledge_base")))
     chroma_persist_dir: Path = project_root / "data" / "chromadb"
     
     # RAG Configuration

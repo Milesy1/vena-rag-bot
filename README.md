@@ -1,4 +1,4 @@
-# Vena RAG Bot - Proof of Concept
+# FCS RAG Bot - Proof of Concept
 
 AI-powered technical support assistant for Vena platform using Retrieval Augmented Generation (RAG).
 
