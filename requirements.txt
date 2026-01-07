@@ -22,7 +22,6 @@ streamlit==1.35.0
 # Document Processing
 python-dotenv==1.0.1
 tiktoken>=0.8.0
-pypdf==4.0.1
 
 # Utilities
 pydantic>=2.10.0

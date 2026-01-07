@@ -42,6 +42,14 @@ class RAGPipeline:
     
     def __init__(self):
         """Initialize the RAG pipeline."""
+        # Workaround for proxies issue with langchain-openai 0.1.7
+        import openai
+        original_init = openai.OpenAI.__init__
+        def patched_init(self, *args, **kwargs):
+            kwargs.pop('proxies', None)  # Remove proxies if present
+            return original_init(self, *args, **kwargs)
+        openai.OpenAI.__init__ = patched_init
+        
         self.embeddings = OpenAIEmbeddings(
             model=settings.embedding_model,
             openai_api_key=settings.openai_api_key

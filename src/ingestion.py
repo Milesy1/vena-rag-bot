@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 from typing import List
 
-from langchain_community.document_loaders import DirectoryLoader, TextLoader, PyPDFLoader
+from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
@@ -18,45 +18,31 @@ from src.config import settings, validate_settings
 
 
 def load_documents(knowledge_base_path: Path) -> List:
-    """Load all markdown, text, and PDF documents from knowledge base."""
+    """Load all markdown and text documents from knowledge base."""
     
     print(f"[INFO] Loading documents from: {knowledge_base_path}")
     
     documents = []
     
-    try:
-        # Load markdown files
-        md_loader = DirectoryLoader(
-            str(knowledge_base_path),
-            glob="**/*.md",
-            loader_cls=TextLoader,
-            loader_kwargs={"encoding": "utf-8"}
-        )
-        documents.extend(md_loader.load())
-        
-        # Load text files
-        txt_loader = DirectoryLoader(
-            str(knowledge_base_path),
-            glob="**/*.txt",
-            loader_cls=TextLoader,
-            loader_kwargs={"encoding": "utf-8"}
-        )
-        documents.extend(txt_loader.load())
-        
-        # Load PDF files
-        pdf_loader = DirectoryLoader(
-            str(knowledge_base_path),
-            glob="**/*.pdf",
-            loader_cls=PyPDFLoader
-        )
-        documents.extend(pdf_loader.load())
-        
-        print(f"   Found {len(documents)} documents")
-        
-    except Exception as e:
-        print(f"   [WARN] Error loading some documents: {e}")
-        print(f"   Continuing with {len(documents)} documents loaded so far...")
+    # Load markdown files
+    md_loader = DirectoryLoader(
+        str(knowledge_base_path),
+        glob="**/*.md",
+        loader_cls=TextLoader,
+        loader_kwargs={"encoding": "utf-8"}
+    )
+    documents.extend(md_loader.load())
     
+    # Load text files
+    txt_loader = DirectoryLoader(
+        str(knowledge_base_path),
+        glob="**/*.txt",
+        loader_cls=TextLoader,
+        loader_kwargs={"encoding": "utf-8"}
+    )
+    documents.extend(txt_loader.load())
+    
+    print(f"   Found {len(documents)} documents")
     return documents
 
 
@@ -86,6 +72,14 @@ def create_vector_store(chunks: List) -> Chroma:
     settings.chroma_persist_dir.mkdir(parents=True, exist_ok=True)
     
     # Initialize embeddings
+    # Workaround for proxies issue with langchain-openai 0.1.7
+    import openai
+    original_init = openai.OpenAI.__init__
+    def patched_init(self, *args, **kwargs):
+        kwargs.pop('proxies', None)  # Remove proxies if present
+        return original_init(self, *args, **kwargs)
+    openai.OpenAI.__init__ = patched_init
+    
     embeddings = OpenAIEmbeddings(
         model=settings.embedding_model,
         openai_api_key=settings.openai_api_key
@@ -125,7 +119,7 @@ def ingest_knowledge_base() -> Chroma:
     
     if len(documents) == 0:
         print("[ERROR] No documents found in knowledge base!")
-        print("   Add .md, .txt, or .pdf files to knowledge_base/ folder")
+        print("   Add .md or .txt files to knowledge_base/ folder")
         raise FileNotFoundError("No documents to ingest!")
     
     # Chunk documents
