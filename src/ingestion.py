@@ -20,7 +20,7 @@ from src.config import settings, validate_settings
 def load_documents(knowledge_base_path: Path) -> List:
     """Load all markdown, text, and PDF documents from knowledge base."""
     
-    print(f"📂 Loading documents from: {knowledge_base_path}")
+    print(f"[INFO] Loading documents from: {knowledge_base_path}")
     
     documents = []
     
@@ -54,7 +54,7 @@ def load_documents(knowledge_base_path: Path) -> List:
         print(f"   Found {len(documents)} documents")
         
     except Exception as e:
-        print(f"   ⚠️  Error loading some documents: {e}")
+        print(f"   [WARN] Error loading some documents: {e}")
         print(f"   Continuing with {len(documents)} documents loaded so far...")
     
     return documents
@@ -63,7 +63,7 @@ def load_documents(knowledge_base_path: Path) -> List:
 def chunk_documents(documents: List) -> List:
     """Split documents into smaller chunks for embedding."""
     
-    print(f"✂️  Chunking documents...")
+    print(f"[INFO] Chunking documents...")
     
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=settings.chunk_size,
@@ -80,7 +80,7 @@ def chunk_documents(documents: List) -> List:
 def create_vector_store(chunks: List) -> Chroma:
     """Create ChromaDB vector store from document chunks."""
     
-    print(f"🔢 Generating embeddings and storing in ChromaDB...")
+    print(f"[INFO] Generating embeddings and storing in ChromaDB...")
     
     # Ensure directory exists
     settings.chroma_persist_dir.mkdir(parents=True, exist_ok=True)
@@ -98,7 +98,7 @@ def create_vector_store(chunks: List) -> Chroma:
         persist_directory=str(settings.chroma_persist_dir)
     )
     
-    print(f"   ✅ Vector store created at: {settings.chroma_persist_dir}")
+    print(f"   [OK] Vector store created at: {settings.chroma_persist_dir}")
     return vector_store
 
 
@@ -106,7 +106,7 @@ def ingest_knowledge_base() -> Chroma:
     """Main ingestion pipeline: Load → Chunk → Embed → Store."""
     
     print("\n" + "="*50)
-    print("🚀 Vena RAG Bot - Knowledge Base Ingestion")
+    print("Vena RAG Bot - Knowledge Base Ingestion")
     print("="*50 + "\n")
     
     # Validate configuration
@@ -115,7 +115,7 @@ def ingest_knowledge_base() -> Chroma:
     
     # Check knowledge base exists
     if not settings.knowledge_base_dir.exists():
-        print(f"❌ Knowledge base directory not found: {settings.knowledge_base_dir}")
+        print(f"[ERROR] Knowledge base directory not found: {settings.knowledge_base_dir}")
         print("   Creating empty directory structure...")
         settings.knowledge_base_dir.mkdir(parents=True, exist_ok=True)
         raise FileNotFoundError("Add documents to knowledge_base/ folder first!")
@@ -124,7 +124,7 @@ def ingest_knowledge_base() -> Chroma:
     documents = load_documents(settings.knowledge_base_dir)
     
     if len(documents) == 0:
-        print("❌ No documents found in knowledge base!")
+        print("[ERROR] No documents found in knowledge base!")
         print("   Add .md, .txt, or .pdf files to knowledge_base/ folder")
         raise FileNotFoundError("No documents to ingest!")
     
@@ -135,7 +135,7 @@ def ingest_knowledge_base() -> Chroma:
     vector_store = create_vector_store(chunks)
     
     print("\n" + "="*50)
-    print("✅ Ingestion complete!")
+    print("[OK] Ingestion complete!")
     print(f"   Documents: {len(documents)}")
     print(f"   Chunks: {len(chunks)}")
     print("="*50 + "\n")
