@@ -9,6 +9,14 @@ import os
 from pathlib import Path
 from typing import List
 
+# Fix for proxies error with langchain-openai 0.1.7 and newer OpenAI
+import openai
+_original_openai_init = openai.OpenAI.__init__
+def _patched_openai_init(self, *args, **kwargs):
+    kwargs.pop('proxies', None)
+    return _original_openai_init(self, *args, **kwargs)
+openai.OpenAI.__init__ = _patched_openai_init
+
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
@@ -72,14 +80,6 @@ def create_vector_store(chunks: List) -> Chroma:
     settings.chroma_persist_dir.mkdir(parents=True, exist_ok=True)
     
     # Initialize embeddings
-    # Workaround for proxies issue with langchain-openai 0.1.7
-    import openai
-    original_init = openai.OpenAI.__init__
-    def patched_init(self, *args, **kwargs):
-        kwargs.pop('proxies', None)  # Remove proxies if present
-        return original_init(self, *args, **kwargs)
-    openai.OpenAI.__init__ = patched_init
-    
     embeddings = OpenAIEmbeddings(
         model=settings.embedding_model,
         openai_api_key=settings.openai_api_key

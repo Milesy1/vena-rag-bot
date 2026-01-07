@@ -7,6 +7,14 @@ Handles semantic search in ChromaDB and response synthesis using GPT-4.
 from typing import List, Dict, Tuple
 from pathlib import Path
 
+# Fix for proxies error with langchain-openai 0.1.7 and newer OpenAI
+import openai
+_original_openai_init = openai.OpenAI.__init__
+def _patched_openai_init(self, *args, **kwargs):
+    kwargs.pop('proxies', None)
+    return _original_openai_init(self, *args, **kwargs)
+openai.OpenAI.__init__ = _patched_openai_init
+
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
 from langchain_core.prompts import ChatPromptTemplate
@@ -42,14 +50,6 @@ class RAGPipeline:
     
     def __init__(self):
         """Initialize the RAG pipeline."""
-        # Workaround for proxies issue with langchain-openai 0.1.7
-        import openai
-        original_init = openai.OpenAI.__init__
-        def patched_init(self, *args, **kwargs):
-            kwargs.pop('proxies', None)  # Remove proxies if present
-            return original_init(self, *args, **kwargs)
-        openai.OpenAI.__init__ = patched_init
-        
         self.embeddings = OpenAIEmbeddings(
             model=settings.embedding_model,
             openai_api_key=settings.openai_api_key
