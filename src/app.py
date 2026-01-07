@@ -4,6 +4,8 @@ Streamlit chat interface for the Vena RAG Bot.
 Run with: streamlit run src/app.py
 """
 
+# Force rebuild - OpenAI 1.12.0 fix
+
 import streamlit as st
 from pathlib import Path
 
