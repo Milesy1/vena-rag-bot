@@ -147,6 +147,11 @@ def get_rag_pipeline() -> RAGPipeline:
         _rag_pipeline = RAGPipeline()
     return _rag_pipeline
 
+def reset_rag_pipeline():
+    """Reset the RAG pipeline singleton (call after rebuilding knowledge base)."""
+    global _rag_pipeline
+    _rag_pipeline = None
+
 if __name__ == "__main__":
     # Test the pipeline
     from src.config import validate_settings

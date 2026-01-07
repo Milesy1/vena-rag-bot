@@ -84,6 +84,20 @@ def main():
         # Vector store status
         if settings.chroma_persist_dir.exists():
             st.success("✅ Knowledge base loaded")
+            if st.button("🔄 Rebuild Knowledge Base", type="secondary"):
+                with st.spinner("Rebuilding knowledge base... This may take a few minutes."):
+                    try:
+                        from src.ingestion import ingest_knowledge_base
+                        from src.retrieval import reset_rag_pipeline
+                        ingest_knowledge_base()
+                        st.success("✅ Knowledge base rebuilt successfully!")
+                        # Reset RAG pipeline to force reload with new data
+                        reset_rag_pipeline()
+                        st.session_state.rag_pipeline = None
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Failed to rebuild knowledge base: {str(e)}")
+                        st.exception(e)
         else:
             st.warning("⚠️ Knowledge base not found")
             if st.button("📥 Build Knowledge Base", type="primary"):
