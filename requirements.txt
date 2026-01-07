@@ -9,8 +9,8 @@ langchain-community==0.0.38
 # Vector Database
 chromadb==0.4.24
 
-# OpenAI
-openai>=1.24.0,<1.30.0
+# OpenAI (pinned to version that accepts proxies parameter)
+openai==1.12.0
 
 # Web Framework
 fastapi==0.111.0
