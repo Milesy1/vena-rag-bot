@@ -9,13 +9,8 @@ from pathlib import Path
 
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
-<<<<<<< HEAD
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema import Document
-=======
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.documents import Document
->>>>>>> 8d6f9d581e1a19332070f83b53fbf922e1fb730c
 
 from src.config import settings
 
@@ -70,25 +65,14 @@ class RAGPipeline:
     
     def _load_vector_store(self):
         """Load existing ChromaDB vector store."""
-<<<<<<< HEAD
         if settings.chroma_persist_dir.exists():
-=======
-        chroma_db_file = settings.chroma_persist_dir / "chroma.sqlite3"
-        if chroma_db_file.exists():
->>>>>>> 8d6f9d581e1a19332070f83b53fbf922e1fb730c
             self.vector_store = Chroma(
                 persist_directory=str(settings.chroma_persist_dir),
                 embedding_function=self.embeddings
             )
-<<<<<<< HEAD
-            print(f"✅ Loaded vector store from: {settings.chroma_persist_dir}")
-        else:
-            print("⚠️  No vector store found. Run ingestion first!")
-=======
             print(f"[OK] Loaded vector store from: {settings.chroma_persist_dir}")
         else:
             print("[WARNING] No vector store found. Run ingestion first!")
->>>>>>> 8d6f9d581e1a19332070f83b53fbf922e1fb730c
             self.vector_store = None
     
     def retrieve(self, query: str, top_k: int = None) -> List[Document]:
@@ -132,11 +116,7 @@ class RAGPipeline:
         Returns:
             Tuple of (response_text, source_documents)
         """
-<<<<<<< HEAD
-        print(f"\n🔍 Query: {question}")
-=======
         print(f"\n[QUERY] {question}")
->>>>>>> 8d6f9d581e1a19332070f83b53fbf922e1fb730c
         
         # Retrieve relevant documents
         documents = self.retrieve(question)
@@ -167,15 +147,6 @@ def get_rag_pipeline() -> RAGPipeline:
         _rag_pipeline = RAGPipeline()
     return _rag_pipeline
 
-<<<<<<< HEAD
-=======
-def reset_rag_pipeline():
-    """Reset the RAG pipeline singleton (call after rebuilding knowledge base)."""
-    global _rag_pipeline
-    _rag_pipeline = None
-
->>>>>>> 8d6f9d581e1a19332070f83b53fbf922e1fb730c
-
 if __name__ == "__main__":
     # Test the pipeline
     from src.config import validate_settings
@@ -194,9 +165,3 @@ if __name__ == "__main__":
         print("\n" + "="*50)
         print("SOURCES:", pipeline.get_sources(docs))
         print("="*50)
-
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 8d6f9d581e1a19332070f83b53fbf922e1fb730c
