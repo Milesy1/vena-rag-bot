@@ -5,6 +5,7 @@ Configuration settings for the Vena RAG Bot POC.
 import os
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator, computed_field
 
 
 class Settings(BaseSettings):
@@ -21,11 +22,6 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4o"
     embedding_model: str = "text-embedding-3-small"
     
-    # Paths
-    project_root: Path = Path(__file__).parent.parent
-    knowledge_base_dir: Path = project_root / "knowledge_base"
-    chroma_persist_dir: Path = project_root / "data" / "chromadb"
-    
     # RAG Configuration
     chunk_size: int = 500  # tokens per chunk
     chunk_overlap: int = 50  # overlap between chunks
@@ -34,6 +30,26 @@ class Settings(BaseSettings):
     # Model Configuration
     max_tokens: int = 2000  # max response tokens
     temperature: float = 0.1  # low temperature for factual responses
+    
+    @computed_field
+    @property
+    def project_root(self) -> Path:
+        """Get project root directory."""
+        # Get the directory containing this config file
+        config_file = Path(__file__)
+        return config_file.parent.parent
+    
+    @computed_field
+    @property
+    def knowledge_base_dir(self) -> Path:
+        """Get knowledge base directory."""
+        return self.project_root / "knowledge_base"
+    
+    @computed_field
+    @property
+    def chroma_persist_dir(self) -> Path:
+        """Get ChromaDB persistence directory."""
+        return self.project_root / "data" / "chromadb"
 
 
 # Global settings instance
