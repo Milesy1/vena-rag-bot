@@ -11,6 +11,22 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# CRITICAL: Patch OpenAI client BEFORE any langchain imports
+# This must happen before Pydantic validation occurs
+import openai
+_original_openai_init = openai.OpenAI.__init__
+def _patched_openai_init(self, *args, **kwargs):
+    kwargs.pop('proxies', None)
+    return _original_openai_init(self, *args, **kwargs)
+openai.OpenAI.__init__ = _patched_openai_init
+
+# Also patch AsyncOpenAI
+_original_async_openai_init = openai.AsyncOpenAI.__init__
+def _patched_async_openai_init(self, *args, **kwargs):
+    kwargs.pop('proxies', None)
+    return _original_async_openai_init(self, *args, **kwargs)
+openai.AsyncOpenAI.__init__ = _patched_async_openai_init
+
 from src.config import settings, validate_settings
 from src.retrieval import get_rag_pipeline
 
