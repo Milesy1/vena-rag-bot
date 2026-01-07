@@ -11,22 +11,26 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# CRITICAL: Patch OpenAI client BEFORE any langchain imports
-# This must happen before Pydantic validation occurs
-import openai
-_original_openai_init = openai.OpenAI.__init__
-def _patched_openai_init(self, *args, **kwargs):
-    kwargs.pop('proxies', None)
-    return _original_openai_init(self, *args, **kwargs)
-openai.OpenAI.__init__ = _patched_openai_init
+# CRITICAL: Patch OpenAIEmbeddings to remove proxies BEFORE Pydantic validation
+# This must happen before any imports that use OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings as _OriginalOpenAIEmbeddings
 
-# Also patch AsyncOpenAI
-_original_async_openai_init = openai.AsyncOpenAI.__init__
-def _patched_async_openai_init(self, *args, **kwargs):
-    kwargs.pop('proxies', None)
-    return _original_async_openai_init(self, *args, **kwargs)
-openai.AsyncOpenAI.__init__ = _patched_async_openai_init
+# Patch OpenAIEmbeddings to filter out proxies parameter before Pydantic validation
+_original_model_validate = _OriginalOpenAIEmbeddings.model_validate
+def _patched_model_validate(cls, obj, **kwargs):
+    if isinstance(obj, dict):
+        obj = {k: v for k, v in obj.items() if k != 'proxies'}
+    return _original_model_validate(obj, **kwargs)
+_OriginalOpenAIEmbeddings.model_validate = classmethod(_patched_model_validate)
 
+# Also patch __init__ as backup
+_original_init = _OriginalOpenAIEmbeddings.__init__
+def _patched_init(self, **kwargs):
+    kwargs.pop('proxies', None)
+    return _original_init(self, **kwargs)
+_OriginalOpenAIEmbeddings.__init__ = _patched_init
+
+# Now import the rest
 from src.config import settings, validate_settings
 from src.retrieval import get_rag_pipeline
 
