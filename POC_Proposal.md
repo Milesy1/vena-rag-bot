@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # Vena RAG Bot - Proof of Concept Proposal
+=======
+# FCS RAG Bot - Proof of Concept Proposal
+>>>>>>> 8d6f9d581e1a19332070f83b53fbf922e1fb730c
 
 **Document Version:** 1.0  
 **Date:** December 24, 2024  
@@ -344,5 +348,8 @@ This POC validates the foundational capabilities defined in the Business Require
 
 *Document End*
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 8d6f9d581e1a19332070f83b53fbf922e1fb730c

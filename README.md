@@ -1,4 +1,4 @@
-# Vena RAG Bot - Proof of Concept
+# FCS RAG Bot - Proof of Concept
 
 AI-powered technical support assistant for Vena platform using Retrieval Augmented Generation (RAG).
 
@@ -86,6 +86,4 @@ streamlit run src/app.py
 ---
 
 *Part of the Vena RAG-Based Technical Support System initiative*
-
-
 
