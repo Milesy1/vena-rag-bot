@@ -4,11 +4,17 @@ Configuration settings for the Vena RAG Bot POC.
 
 import os
 from pathlib import Path
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+    
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
     
     # OpenAI Configuration
     openai_api_key: str = ""
@@ -28,11 +34,6 @@ class Settings(BaseSettings):
     # Model Configuration
     max_tokens: int = 2000  # max response tokens
     temperature: float = 0.1  # low temperature for factual responses
-    
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        extra = "ignore"
 
 
 # Global settings instance
