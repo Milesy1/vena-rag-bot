@@ -84,7 +84,19 @@ def main():
             st.success("✅ Knowledge base loaded")
         else:
             st.warning("⚠️ Knowledge base not found")
-            st.info("Run: python -m src.ingestion")
+            if st.button("📥 Build Knowledge Base", type="primary"):
+                with st.spinner("Building knowledge base... This may take a few minutes."):
+                    try:
+                        from src.ingestion import ingest_knowledge_base
+                        ingest_knowledge_base()
+                        st.success("✅ Knowledge base built successfully!")
+                        st.info("Please refresh the page to load the RAG pipeline.")
+                        # Reset RAG pipeline to force reload
+                        st.session_state.rag_pipeline = None
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Failed to build knowledge base: {str(e)}")
+                        st.exception(e)
         
         st.divider()
         
@@ -102,7 +114,10 @@ def main():
     
     # Load RAG pipeline
     if not load_rag_pipeline():
-        st.warning("Please configure the system and ingest documents first.")
+        if not settings.chroma_persist_dir.exists():
+            st.info("👆 Click **'Build Knowledge Base'** in the sidebar to get started!")
+        else:
+            st.warning("Please configure the system and ingest documents first.")
         return
     
     # Display chat history
