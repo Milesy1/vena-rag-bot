@@ -1,5 +1,5 @@
 """
-Configuration settings for the Vena RAG Bot POC.
+Configuration settings for the FCS RAG Bot POC.
 """
 
 import os

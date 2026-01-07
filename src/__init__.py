@@ -1,4 +1,4 @@
-# Vena RAG Bot POC - Source Package
+# FCS RAG Bot POC - Source Package
 """
 RAG-based technical support system for Vena platform.
 """

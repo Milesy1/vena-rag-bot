@@ -1,5 +1,5 @@
 """
-Streamlit chat interface for the Vena RAG Bot.
+Streamlit chat interface for the FCS RAG Bot.
 
 Run with: streamlit run src/app.py
 """
@@ -19,7 +19,7 @@ from src.retrieval import get_rag_pipeline
 
 # Page configuration
 st.set_page_config(
-    page_title="Vena RAG Bot",
+    page_title="FCS RAG Bot",
     page_icon="🤖",
     layout="wide"
 )
@@ -66,7 +66,7 @@ def main():
     initialize_session_state()
     
     # Header
-    st.title("🤖 Vena RAG Bot")
+    st.title("🤖 FCS RAG Bot")
     st.caption("AI-powered technical support for the Vena platform")
     
     # Sidebar
